@@ -3,6 +3,7 @@ package org.jivesoftware.openfire.plugin.rest;
 import org.jivesoftware.openfire.XMPPServer;
 import org.jivesoftware.openfire.interceptor.PacketInterceptor;
 import org.jivesoftware.openfire.interceptor.PacketRejectedException;
+import org.jivesoftware.openfire.plugin.rest.utils.ServerUtils;
 import org.jivesoftware.openfire.session.Session;
 import org.jivesoftware.util.Log;
 import org.slf4j.Logger;
@@ -13,29 +14,22 @@ import org.xmpp.packet.Packet;
 
 public class BroadcastPacketInterceptor implements PacketInterceptor {
 
-    private final String serverName;
-    private final XMPPServer xmppServer;
     private final JID serverAddress;
 
     private final Logger logger = LoggerFactory.getLogger(BroadcastPacketInterceptor.class);
 
     public BroadcastPacketInterceptor() {
-        xmppServer = XMPPServer.getInstance();
-        serverName = xmppServer.getServerInfo().getXMPPDomain();
-        serverAddress = new JID(serverName);
-
-        logger.info("INFO");
-        logger.debug("DEBUG");
+        serverAddress = ServerUtils.getServerAddress();
     }
 
     @Override
     public void interceptPacket(Packet packet, Session session, boolean incoming, boolean processed) throws PacketRejectedException {
-//        System.out.println(packet.toXML());
-        logger.info(packet.toXML());
-        if (serverAddress.equals(packet.getFrom())) {
-            if (packet instanceof Message) {
-                Message message = (Message) packet;
-                logger.info(message.getType().name());
+        if (!processed && !incoming) {
+            JID toJID = packet.getTo();
+            if (serverAddress.equals(packet.getFrom()) && toJID != null) {
+                if (toJID.getResource() != null) {
+                    packet.setTo(toJID.toBareJID());
+                }
             }
         }
     }
