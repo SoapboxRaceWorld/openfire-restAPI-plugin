@@ -25,4 +25,11 @@ public class MessageService {
         messageController.sendBroadcastMessage(messageEntity);
         return Response.status(Response.Status.CREATED).build();
     }
+
+    @POST
+    @Path("/game")
+    public Response sendGameBroadcastMessage(MessageEntity messageEntity) throws ServiceException {
+        messageController.sendGameBroadcastMessage(messageEntity);
+        return Response.status(Response.Status.CREATED).build();
+    }
 }

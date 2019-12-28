@@ -2,16 +2,16 @@
 
 <plugin>
     <class>org.jivesoftware.openfire.plugin.rest.RESTServicePlugin</class>
-    <name>REST API</name>
-    <description>Allows administration over a RESTful API.</description>
-    <author>Roman Soldatow</author>
+    <name>REST API (SBRW)</name>
+    <description>Allows administration over a RESTful API. Updated for SBRW servers.</description>
+    <author>SBRW/Roman Soldatow</author>
     <version>${project.version}</version>
-    <date>03/21/2019</date>
-    <minServerVersion>4.1.1</minServerVersion>
+    <date>12/27/2019</date>
+    <minServerVersion>4.5.0</minServerVersion>
     <adminconsole>
         <tab id="tab-server">
             <sidebar id="sidebar-server-settings">
-                <item id="rest-api" name="REST API" url="rest-api.jsp"
+                <item id="rest-api" name="REST API (SBRW)" url="rest-api.jsp"
                      description="Click to manage the service that allows to configure the Openfire over a RESTFul API" />
             </sidebar>
         </tab>

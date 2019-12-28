@@ -27,6 +27,7 @@ import javax.ws.rs.core.Response;
 
 import org.jivesoftware.openfire.container.Plugin;
 import org.jivesoftware.openfire.container.PluginManager;
+import org.jivesoftware.openfire.interceptor.InterceptorManager;
 import org.jivesoftware.openfire.plugin.rest.entity.SystemProperties;
 import org.jivesoftware.openfire.plugin.rest.entity.SystemProperty;
 import org.jivesoftware.openfire.plugin.rest.exceptions.ExceptionType;
@@ -57,6 +58,7 @@ public class RESTServicePlugin implements Plugin, PropertyEventListener {
     
     /** The enabled. */
     private boolean enabled;
+    private BroadcastPacketInterceptor broadcastPacketInterceptor;
 
     public boolean isServiceLoggingEnabled() {
         return serviceLoggingEnabled;
@@ -75,6 +77,7 @@ public class RESTServicePlugin implements Plugin, PropertyEventListener {
     /** The custom authentication filter */
     private String customAuthFilterClassName;
 
+    private InterceptorManager interceptorManager;
 
     /**
      * Gets the single instance of RESTServicePlugin.
@@ -112,6 +115,10 @@ public class RESTServicePlugin implements Plugin, PropertyEventListener {
         setServiceLoggingEnabled(JiveGlobals.getBooleanProperty(SERVICE_LOGGING_ENABLED, false));
         // Listen to system property events
         PropertyEventDispatcher.addListener(this);
+
+        interceptorManager = InterceptorManager.getInstance();
+        broadcastPacketInterceptor = new BroadcastPacketInterceptor();
+        interceptorManager.addInterceptor(broadcastPacketInterceptor);
     }
 
     /* (non-Javadoc)
@@ -120,6 +127,7 @@ public class RESTServicePlugin implements Plugin, PropertyEventListener {
     public void destroyPlugin() {
         // Stop listening to system property events
         PropertyEventDispatcher.removeListener(this);
+        interceptorManager.removeInterceptor(broadcastPacketInterceptor);
     }
 
     /**
