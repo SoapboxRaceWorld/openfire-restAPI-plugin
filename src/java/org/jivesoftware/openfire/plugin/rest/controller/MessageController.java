@@ -2,6 +2,7 @@ package org.jivesoftware.openfire.plugin.rest.controller;
 
 import javax.ws.rs.core.Response;
 
+import org.jivesoftware.openfire.MessageRouter;
 import org.jivesoftware.openfire.SessionManager;
 import org.jivesoftware.openfire.XMPPServer;
 import org.jivesoftware.openfire.plugin.rest.BroadcastPacketInterceptor;
@@ -66,34 +67,26 @@ public class MessageController {
      * @throws ServiceException when an empty message is provided
      */
     public void sendGameBroadcastMessage(String messageEntity) throws ServiceException {
-        if (messageEntity != null && !messageEntity.isEmpty()) {
-            Message message = new Message();
-            message.setFrom(serverAddress);
-            message.setBody(messageEntity);
-            message.setID("JN_1234567");
+        // Build the system message XML
+        String systemMsg = String.format("<response status='1' ticket='0'>\n" +
+            "<ChatBroadcast>\n" +
+            "<ChatBlob>\n" +
+            "<FromName>System</FromName>\n" +
+            "<FromPersonaId>0</FromPersonaId>\n" +
+            "<FromUserId>0</FromUserId>\n" +
+            "<Message>%s</Message>\n" +
+            "<ToId>0</ToId>\n" +
+            "<Type>2</Type>\n" +
+            "</ChatBlob>\n" +
+            "</ChatBroadcast>\n" +
+            "</response>", messageEntity);
 
-            for (ClientSession c : SessionManager.getInstance().getSessions()) {
-                if (c.getStatus() == Session.STATUS_AUTHENTICATED) {
-                    Presence presence = c.getPresence();
+        Message xmppMessage = new Message();
+        xmppMessage.setSubject("1337733113377331");
+        xmppMessage.setFrom(ServerUtils.getServerAddress());
+        xmppMessage.setID("JN_1234567");
+        xmppMessage.setBody(systemMsg);
 
-                    if (presence != null && presence.isAvailable()) {
-                        String bareJID = c.getAddress().toBareJID();
-                        message.setTo(bareJID);
-                        message.setSubject(Long.toString(SubjectCalc.calculateHash(bareJID.toCharArray(), messageEntity.toCharArray())));
-
-                        try {
-                            SessionManager.getInstance().userBroadcast(c.getUsername(), message);
-                        } catch (UserNotFoundException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-            }
-//            SessionManager.getInstance().broadcast(message);
-        } else {
-            throw new ServiceException("Message content/body is null or empty", "",
-                ExceptionType.ILLEGAL_ARGUMENT_EXCEPTION,
-                Response.Status.BAD_REQUEST);
-        }
+        XMPPServer.getInstance().getSessionManager().broadcast(xmppMessage);
     }
 }

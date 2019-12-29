@@ -24,13 +24,7 @@ public class BroadcastPacketInterceptor implements PacketInterceptor {
 
     @Override
     public void interceptPacket(Packet packet, Session session, boolean incoming, boolean processed) throws PacketRejectedException {
-        if (!processed && !incoming) {
-            JID toJID = packet.getTo();
-            if (serverAddress.equals(packet.getFrom()) && toJID != null) {
-                if (toJID.getResource() != null) {
-                    packet.setTo(toJID.toBareJID());
-                }
-            }
-        }
+        System.out.println("NEW PACKET (I=" + incoming + " P=" + processed + ")");
+        System.out.println(packet.toXML());
     }
 }

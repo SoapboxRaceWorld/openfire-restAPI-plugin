@@ -6,6 +6,6 @@ import org.xmpp.packet.JID;
 public class ServerUtils {
     public static JID getServerAddress() {
         String serverName = XMPPServer.getInstance().getServerInfo().getXMPPDomain();
-        return new JID("sbrw.engine.engine", serverName, "");
+        return new JID("sbrw.engine.engine", serverName, "EA_Chat");
     }
 }
