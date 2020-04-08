@@ -1,24 +1,14 @@
 package org.jivesoftware.openfire.plugin.rest.controller;
 
-import javax.ws.rs.core.Response;
-
-import org.jivesoftware.openfire.MessageRouter;
 import org.jivesoftware.openfire.SessionManager;
 import org.jivesoftware.openfire.XMPPServer;
-import org.jivesoftware.openfire.plugin.rest.BroadcastPacketInterceptor;
 import org.jivesoftware.openfire.plugin.rest.entity.MessageEntity;
 import org.jivesoftware.openfire.plugin.rest.exceptions.ExceptionType;
 import org.jivesoftware.openfire.plugin.rest.exceptions.ServiceException;
 import org.jivesoftware.openfire.plugin.rest.utils.ServerUtils;
-import org.jivesoftware.openfire.plugin.rest.utils.SubjectCalc;
-import org.jivesoftware.openfire.session.ClientSession;
-import org.jivesoftware.openfire.session.Session;
-import org.jivesoftware.openfire.user.UserNotFoundException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.xmpp.packet.JID;
 import org.xmpp.packet.Message;
-import org.xmpp.packet.Presence;
+
+import javax.ws.rs.core.Response;
 
 /**
  * The Class MessageController.
@@ -36,12 +26,6 @@ public class MessageController {
      */
     public static MessageController getInstance() {
         return INSTANCE;
-    }
-
-    private final JID serverAddress;
-
-    public MessageController() {
-        serverAddress = ServerUtils.getServerAddress();
     }
 
     /**
@@ -63,10 +47,9 @@ public class MessageController {
     /**
      * Send client-compatible broadcast message.
      *
-     * @param messageEntity the message entity
-     * @throws ServiceException when an empty message is provided
+     * @param systemMessageBody the message to send
      */
-    public void sendGameBroadcastMessage(String messageEntity) throws ServiceException {
+    public void sendGameBroadcastMessage(String systemMessageBody) {
         // Build the system message XML
         String systemMsg = String.format("<response status='1' ticket='0'>\n" +
             "<ChatBroadcast>\n" +
@@ -79,7 +62,7 @@ public class MessageController {
             "<Type>2</Type>\n" +
             "</ChatBlob>\n" +
             "</ChatBroadcast>\n" +
-            "</response>", messageEntity);
+            "</response>", systemMessageBody);
 
         Message xmppMessage = new Message();
         xmppMessage.setSubject("1337733113377331");
