@@ -21,6 +21,14 @@ import org.jivesoftware.openfire.plugin.rest.controller.MUCRoomController;
 public class MUCRoomService {
 
     @GET
+    @Path("/forUser")
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public MUCRoomEntities getMUCUserRooms(@QueryParam("userAddress") String userAddress,
+                                           @DefaultValue("conference") @QueryParam("servicename") String serviceName) {
+        return MUCRoomController.getInstance().getUserRooms(userAddress, serviceName);
+    }
+
+    @GET
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public MUCRoomEntities getMUCRooms(@DefaultValue("conference") @QueryParam("servicename") String serviceName,
             @DefaultValue(MUCChannelType.PUBLIC) @QueryParam("type") String channelType,

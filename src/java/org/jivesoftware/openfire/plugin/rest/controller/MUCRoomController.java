@@ -330,6 +330,30 @@ public class MUCRoomController {
         participantEntities.setParticipants(participants);
         return participantEntities;
     }
+
+    /**
+     * Gets the room participants.
+     *
+     * @param userName
+     *            the user name
+     * @param serviceName
+     *            the service name
+     * @return the room participants
+     */
+    public MUCRoomEntities getUserRooms(String userName, String serviceName) {
+        MUCRoomEntities roomEntities = new MUCRoomEntities();
+        List<MUCRoomEntity> rooms = new ArrayList<MUCRoomEntity>();
+
+        Collection<MUCRole> roles = XMPPServer.getInstance().getMultiUserChatManager()
+                .getMultiUserChatService(serviceName).getMUCRoles(new JID(userName));
+
+        for (MUCRole role : roles) {
+            rooms.add(convertToMUCRoomEntity(role.getChatRoom(), false));
+        }
+
+        roomEntities.setMucRooms(rooms);
+        return roomEntities;
+    }
     
     /**
      * Gets the room occupants.
