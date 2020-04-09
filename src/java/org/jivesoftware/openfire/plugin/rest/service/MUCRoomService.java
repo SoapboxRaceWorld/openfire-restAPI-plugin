@@ -23,9 +23,13 @@ public class MUCRoomService {
     @GET
     @Path("/forUser")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public MUCRoomEntities getMUCUserRooms(@QueryParam("userAddress") String userAddress,
+    public MUCRoomEntities getMUCUserRooms(@QueryParam("userName") String userName,
+                                           @QueryParam("domain") String domain,
+                                           @QueryParam("resource") String resource,
                                            @DefaultValue("conference") @QueryParam("servicename") String serviceName) {
-        return MUCRoomController.getInstance().getUserRooms(userAddress, serviceName);
+        // userAddress format:  username@domain/resource
+        String format = String.format("%s@%s/%s", userName, domain, resource);
+        return MUCRoomController.getInstance().getUserRooms(format, serviceName);
     }
 
     @GET
