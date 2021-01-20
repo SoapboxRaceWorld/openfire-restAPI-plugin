@@ -46,7 +46,7 @@ public class MUCRoomController {
 
     /**
      * Gets the single instance of MUCRoomController.
-     * 
+     *
      * @return single instance of MUCRoomController
      */
     public static MUCRoomController getInstance() {
@@ -62,7 +62,7 @@ public class MUCRoomController {
 
     /**
      * Gets the chat rooms.
-     * 
+     *
      * @param serviceName
      *            the service name
      * @param channelType
@@ -97,7 +97,7 @@ public class MUCRoomController {
 
     /**
      * Gets the chat room.
-     * 
+     *
      * @param roomName
      *            the room name
      * @param serviceName
@@ -121,7 +121,7 @@ public class MUCRoomController {
 
     /**
      * Delete chat room.
-     * 
+     *
      * @param roomName
      *            the room name
      * @param serviceName
@@ -221,7 +221,7 @@ public class MUCRoomController {
      *             the forbidden exception
      * @throws ConflictException
      *             the conflict exception
-     * @throws AlreadyExistsException 
+     * @throws AlreadyExistsException
      */
     private void createRoom(MUCRoomEntity mucRoomEntity, String serviceName) throws NotAllowedException,
             ForbiddenException, ConflictException, AlreadyExistsException {
@@ -241,7 +241,7 @@ public class MUCRoomController {
         if(!serviceRegistered) {
             XMPPServer.getInstance().getMultiUserChatManager().createMultiUserChatService(serviceName, serviceName, false);
         }
-        
+
         MUCRoom room = XMPPServer.getInstance().getMultiUserChatManager().getMultiUserChatService(serviceName)
                 .getChatRoom(mucRoomEntity.getRoomName().toLowerCase(), owner);
 
@@ -286,10 +286,10 @@ public class MUCRoomController {
         } else {
             room.setModificationDate(new Date());
         }
-        
+
         // Unlock the room, because the default configuration lock the room.  		
         room.unlock(room.getRole());
-        
+
         // Fire RoomUpdateEvent if cluster is started
         if (ClusterManager.isClusteringStarted()) {
           CacheFactory.doClusterTask(new RoomUpdatedEvent((LocalMUCRoom) room));
@@ -354,7 +354,7 @@ public class MUCRoomController {
         roomEntities.setMucRooms(rooms);
         return roomEntities;
     }
-    
+
     /**
      * Gets the room occupants.
      *
@@ -462,7 +462,7 @@ public class MUCRoomController {
 
     /**
      * Convert to MUC room entity.
-     * 
+     *
      * @param room
      *            the room
      * @return the MUC room entity
@@ -584,7 +584,7 @@ public class MUCRoomController {
             }
         }
     }
-    
+
     /**
      * Adds the admin.
      *
@@ -698,7 +698,7 @@ public class MUCRoomController {
                 .getChatRoom(roomName.toLowerCase());
         try {
               JID userJid = UserUtils.checkAndGetJID(jid);
-              
+
               // Send a presence to other room members
               List<Presence> addNonePresence = room.addNone(userJid, room.getRole());
               for (Presence presence : addNonePresence) {
@@ -709,5 +709,31 @@ public class MUCRoomController {
         } catch (ConflictException e) {
             throw new ServiceException("Could not delete affiliation", jid, ExceptionType.NOT_ALLOWED, Response.Status.CONFLICT, e);
         }
+    }
+
+    public GameGroupChatMembers getPersonaGroupMembers(String username) {
+        MUCRoom foundGroup = null;
+        GameGroupChatMembers gameGroupChatMembers = new GameGroupChatMembers();
+        List<String> members = new ArrayList<>();
+
+        gameGroupChatMembers.setMembers(members);
+
+        for (MUCRoom chatRoom : XMPPServer.getInstance().getMultiUserChatManager().getMultiUserChatService("conference").getChatRooms()) {
+            if (!chatRoom.getName().startsWith("group.")) continue;
+            for (MUCRole occupant : chatRoom.getOccupants()) {
+                if (occupant.getNickname().equalsIgnoreCase(username)) {
+                    foundGroup = chatRoom;
+                    break;
+                }
+            }
+        }
+
+        if (foundGroup != null) {
+            for (MUCRole occupant : foundGroup.getOccupants()) {
+                members.add(occupant.getNickname());
+            }
+        }
+
+        return gameGroupChatMembers;
     }
 }

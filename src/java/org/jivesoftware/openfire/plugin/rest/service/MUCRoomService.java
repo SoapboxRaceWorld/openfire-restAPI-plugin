@@ -33,6 +33,13 @@ public class MUCRoomService {
     }
 
     @GET
+    @Path("/getPersonaGroupMembers")
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public GameGroupChatMembers getPersonaGroupMembers(@QueryParam("userName") String userName) {
+        return MUCRoomController.getInstance().getPersonaGroupMembers(userName);
+    }
+
+    @GET
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public MUCRoomEntities getMUCRooms(@DefaultValue("conference") @QueryParam("servicename") String serviceName,
             @DefaultValue(MUCChannelType.PUBLIC) @QueryParam("type") String channelType,
